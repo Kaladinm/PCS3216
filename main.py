@@ -4,7 +4,7 @@ menemonicDic = {"JP": 0, "RS": 0, "JZ": 1, "JN": 2, "HJ": 3, "AD": 4, "SB": 5,
                 "ML": 6, "DV": 7, "LD": 8, "ST": 9, "SC": 10, "GD": 11, "PD": 12,
                 "OS": 13}
 
-memory = [0 for n in range(4095)]
+memory = [0 for n in range(4096)]
 ci = 0
 ac = 0
 run = False
@@ -34,6 +34,7 @@ def cpuProcess(instruction):
 
     op, operand = getOp(instruction)
     print("EX: ci: {} instruction: {} {}".format(ci, op, operand))
+    data_op = twos_comp(format(memory[operand], 'b'))
 
     if op == 0:
         ci = operand
@@ -51,19 +52,19 @@ def cpuProcess(instruction):
         ci = op
         run = False
     elif op == 4:
-        ac = returnInt16bit(ac + memory[operand])
+        ac = returnInt16bit(ac + data_op)
         ci += 1
     elif op == 5:
-        ac = returnInt16bit(ac - memory[operand])
+        ac = returnInt16bit(ac - data_op)
         ci += 1
     elif op == 6:
-        ac = returnInt16bit(ac * memory[operand])
+        ac = returnInt16bit(ac * data_op)
         ci += 1
     elif op == 7:
-        ac = returnInt16bit(ac // memory[operand])
+        ac = returnInt16bit(ac // data_op)
         ci += 1
     elif op == 8:
-        ac = memory[operand]
+        ac = data_op
         ci += 1
     elif op == 9:
         memory[operand] = ac
@@ -82,7 +83,18 @@ def cpuProcess(instruction):
     elif op == 13:
         print("a ser implementado")
 
+def LoadTextFile():
+    global memory
 
+    arch_name = input("Digite o nome do arquivo: ")
+    f = open(arch_name, "r")
+    init_intr = int(input("Endereço da primeira instrução(decimal): "))
+    for x in f:
+        memory[init_intr] = stringBitToInt(x)
+        init_intr += 1
+        if init_intr >= 4096:
+            init_intr = 0
+    f.close()
 def main():
     # global definitions
     global memory
@@ -91,8 +103,9 @@ def main():
     global run
 
     # code execution
+    print(len(memory))
     while True:
-        inp = int(input("1- Rodar código\n2-Escrever Instruçao\n3- Rodar Arquivo de texto\n4-Print Memoria\n5-Sair\n".format(ci)))
+        inp = int(input("1- Rodar código\n2-Escrever Instruçao\n3- Load Text Archive\n4-Print Memoria\n5-Sair\n".format(ci)))
         if inp == 1:
             run = True
             ci_in = int(input("Escolha o ci para comecar a rodar(atual ci={}): ".format(ci)))
@@ -107,7 +120,7 @@ def main():
             inst_int = stringBitToInt(inst)
             memory[mem_pos] = inst_int
         elif inp == 3:
-            print("a ser feito")
+            LoadTextFile()
         elif inp == 4:
             print(memory)
         else:
