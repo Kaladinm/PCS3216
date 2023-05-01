@@ -7,6 +7,7 @@ menemonicDic = {"JP": 0, "RS": 0, "JZ": 1, "JN": 2, "HJ": 3, "AD": 4, "SB": 5,
 memory = [0 for n in range(4095)]
 ci = 0
 ac = 0
+run = False
 def getOp(instruction):
     op = instruction >> 12
     operand = instruction % 4096
@@ -29,8 +30,10 @@ def cpuProcess(instruction):
     global memory
     global ci
     global ac
+    global run
 
     op, operand = getOp(instruction)
+    print("EX: ci: {} instruction: {} {}".format(ci, op, operand))
 
     if op == 0:
         ci = operand
@@ -46,6 +49,7 @@ def cpuProcess(instruction):
             ci += 1
     elif op == 3:
         ci = op
+        run = False
     elif op == 4:
         ac = returnInt16bit(ac + memory[operand])
         ci += 1
@@ -68,12 +72,13 @@ def cpuProcess(instruction):
         memory[operand] = ci + 1
         ci = operand + 1
     elif op == 11:
-        b = input("Digite em binario sua instrucao (16 bits): ")
-        ac = twos_comp(b)
-    elif op == 12:
         print("Acumulador: ")
         print("inteiro: {}".format(ac))
         print("binario: {}".format(format(ac, 'b')))
+    elif op == 12:
+        b = input("Digite em binario seu valor pro ac (16 bits): ")
+        ac = twos_comp(b)
+        ci += 1
     elif op == 13:
         print("a ser implementado")
 
@@ -83,8 +88,30 @@ def main():
     global memory
     global ci
     global ac
+    global run
 
     # code execution
-    print(getOp(int("1001000000000001", 2)))
+    while True:
+        inp = int(input("1- Rodar código\n2-Escrever Instruçao\n3- Rodar Arquivo de texto\n4-Print Memoria\n5-Sair\n".format(ci)))
+        if inp == 1:
+            run = True
+            ci_in = int(input("Escolha o ci para comecar a rodar(atual ci={}): ".format(ci)))
+            ci = ci_in
+            print("EXECUTING...")
+            while run:
+                cpuProcess(memory[ci])
+            print("EXEC ENDED")
+        elif inp == 2:
+            mem_pos = int(input("Digite a posiçao de memoria(decimal): "))
+            inst = input("Digite a instrução(binário): ")
+            inst_int = stringBitToInt(inst)
+            memory[mem_pos] = inst_int
+        elif inp == 3:
+            print("a ser feito")
+        elif inp == 4:
+            print(memory)
+        else:
+            break
+
 
 main()
