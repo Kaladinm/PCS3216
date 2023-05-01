@@ -75,7 +75,7 @@ def cpuProcess(instruction):
     elif op == 11:
         print("Acumulador: ")
         print("inteiro: {}".format(ac))
-        print("binario: {}".format(format(ac, 'b')))
+        print("binario: {}".format(format(ac, '016b')))
     elif op == 12:
         b = input("Digite em binario seu valor pro ac (16 bits): ")
         ac = twos_comp(b)
@@ -83,18 +83,38 @@ def cpuProcess(instruction):
     elif op == 13:
         print("a ser implementado")
 
-def LoadTextFile():
+def loadTextFile():
     global memory
 
     arch_name = input("Digite o nome do arquivo: ")
-    f = open(arch_name, "r")
-    init_intr = int(input("Endereço da primeira instrução(decimal): "))
-    for x in f:
-        memory[init_intr] = stringBitToInt(x)
-        init_intr += 1
-        if init_intr >= 4096:
-            init_intr = 0
-    f.close()
+    try:
+        f = open(arch_name, "r")
+        init_intr = int(input("Endereço da primeira instrução(decimal): "))
+        for x in f:
+            memory[init_intr] = stringBitToInt(x)
+            init_intr += 1
+            if init_intr >= 4096:
+                init_intr = 0
+        f.close()
+    except:
+        print("ERROR OPENING THE FILE")
+
+def dump():
+    global memory
+
+    arch_name = input("dump file name: ")
+    init = int(input("initial memory pos: "))
+    size = int(input("Program size: "))
+    try:
+        f = open(arch_name, 'w')
+        for i in range(0, size):
+            f.write(format(memory[init], '016b'))
+            f.write('\n')
+            init += 1
+            if init >= 4096:
+                init = 0
+    except:
+        print("error writing file")
 def main():
     # global definitions
     global memory
@@ -105,7 +125,8 @@ def main():
     # code execution
     print(len(memory))
     while True:
-        inp = int(input("1- Rodar código\n2-Escrever Instruçao\n3- Load Text Archive\n4-Print Memoria\n5-Sair\n".format(ci)))
+        inp = int(input("1- Rodar código\n2-Escrever Instruçao\n3- Load Text Archive\n4-Print Memoria\n5-Exec "
+                        "DUMPER\n6-Exit\n".format(ci)))
         if inp == 1:
             run = True
             ci_in = int(input("Escolha o ci para comecar a rodar(atual ci={}): ".format(ci)))
@@ -120,9 +141,11 @@ def main():
             inst_int = stringBitToInt(inst)
             memory[mem_pos] = inst_int
         elif inp == 3:
-            LoadTextFile()
+            loadTextFile()
         elif inp == 4:
             print(memory)
+        elif inp == 5:
+            dump()
         else:
             break
 
