@@ -1,4 +1,3 @@
-import numpy as np
 
 menemonicDic = {"JP": 0, "RS": 0, "JZ": 1, "JN": 2, "HJ": 3, "AD": 4, "SB": 5,
                 "ML": 6, "DV": 7, "LD": 8, "ST": 9, "SC": 10, "GD": 11, "PD": 12,
@@ -34,7 +33,7 @@ def cpuProcess(instruction):
 
     op, operand = getOp(instruction)
     print("EX: ci: {} instruction: {} {}".format(ci, op, operand))
-    data_op = twos_comp(format(memory[operand], 'b'))
+    data_op = twos_comp(format(memory[operand], '016b'))
 
     if op == 0:
         ci = operand
@@ -76,12 +75,14 @@ def cpuProcess(instruction):
         print("Acumulador: ")
         print("inteiro: {}".format(ac))
         print("binario: {}".format(format(ac, '016b')))
+        ci += 1
     elif op == 12:
         b = input("Digite em binario seu valor pro ac (16 bits): ")
         ac = twos_comp(b)
         ci += 1
     elif op == 13:
         print("a ser implementado")
+        ci += 1
 
 def loadTextFile():
     global memory
